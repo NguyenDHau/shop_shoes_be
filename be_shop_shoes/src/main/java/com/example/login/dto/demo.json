@@ -1,0 +1,49 @@
+{
+  "id": 1,
+  "categoryId": 2,
+  "branchId": 2,
+  "name": "addidas",
+  "description": "giaydemo",
+  "price": 20000.0,
+  "productCode": "demo",
+  "productDetail": [
+    {
+      "colorId": 1,
+      "fileUrl": "https://res.cloudinary.com/ddbtn5izu/image/upload/v1731235670/jhphdtxzb3gshjb1frpn.webp",
+      "signature": null,
+      "colorName": "Green",
+      "publicId": null,
+      "inventory": [
+        {
+          "sizeId": 1,
+          "colorId": 1,
+          "quantity": 5,
+          "sizeName": "39"
+        }
+      ],
+      "fileName": "demo.png"
+    },
+    {
+      "colorId": 2,
+      "fileUrl": "https://res.cloudinary.com/ddbtn5izu/image/upload/v1731235670/jhphdtxzb3gshjb1frpn.webp",
+      "signature": null,
+      "colorName": "Red",
+      "publicId": null,
+      "inventory": [
+        {
+          "sizeId": 2,
+          "colorId": 2,
+          "quantity": 3,
+          "sizeName": "40"
+        },
+        {
+          "sizeId": 2,
+          "colorId": 2,
+          "quantity": 2,
+          "sizeName": "40"
+        }
+      ],
+      "fileName": "demo.png"
+    }
+  ]
+}
