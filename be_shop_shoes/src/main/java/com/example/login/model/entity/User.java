@@ -23,6 +23,16 @@ public class User {
     private String phoneNumber;
     private String address;
 
+    private String allowAccess;
+
+    private String avatar;
+
+    @Column(name="public_id")
+    private String publicId;
+
+    @Column(name="signature")
+    private String signature;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -42,7 +52,7 @@ public class User {
 //        this.roles = roles;
 //    }
 
-    public User(String username, String email, String password, String firstName, String lastName, String phoneNumber, String address) {
+    public User(String username, String email, String password, String firstName, String lastName, String phoneNumber, String address, String allowAccess) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -50,6 +60,7 @@ public class User {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.allowAccess = allowAccess;
     }
 
     public Long getId() {
@@ -112,7 +123,7 @@ public class User {
         return phoneNumber;
     }
 
-    public void setPhone(String phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -122,5 +133,37 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getAllowAccess() {
+        return allowAccess;
+    }
+
+    public void setAllowAccess(String allowAccess) {
+        this.allowAccess = allowAccess;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }

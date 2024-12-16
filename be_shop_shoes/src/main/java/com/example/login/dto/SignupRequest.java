@@ -15,6 +15,8 @@ public class SignupRequest {
     private String address;
     private Set<String> role;
 
+    private String allowAccess;
+
     public SignupRequest() {
     }
 
@@ -80,5 +82,13 @@ public class SignupRequest {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getAllowAccess() {
+        return allowAccess;
+    }
+
+    public void setAllowAccess(String allowAccess) {
+        this.allowAccess = allowAccess;
     }
 }

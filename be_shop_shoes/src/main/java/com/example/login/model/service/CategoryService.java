@@ -26,6 +26,9 @@ public class CategoryService {
         if (existingCategory.isPresent()) {
             Category updatedCategory = existingCategory.get();
             updatedCategory.setName(category.getName());
+            updatedCategory.setCategoryUrl(category.getCategoryUrl());
+            updatedCategory.setPublicId(category.getPublicId());
+            updatedCategory.setSignature(category.getSignature());
             // Cập nhật các thuộc tính khác nếu cần
             return categoryRepository.save(updatedCategory);
         } else {

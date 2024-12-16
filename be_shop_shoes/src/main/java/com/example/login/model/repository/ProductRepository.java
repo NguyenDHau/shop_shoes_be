@@ -1,6 +1,7 @@
 package com.example.login.model.repository;
 
 import com.example.login.dto.ProductResponse;
+import com.example.login.dto.ProductWithImageDto;
 import com.example.login.dto.product.ProductUpdateProjection;
 import com.example.login.model.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,4 +61,25 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "from product p\n" +
             "where p.id = :id ", nativeQuery = true)
     ProductUpdateProjection getProductUpdateDetails(@Param("id") Long id);
+
+    // Lọc sản phẩm theo branchId
+
+    @Query("SELECT p.id, p.name, p.price, MIN(fpi.fileUrl) AS fileUrl " +
+            "FROM Product p " +
+            "JOIN ProductColor pc ON pc.productId = p.id " +
+            "JOIN FileProductImg fpi ON fpi.productColorId = pc.id " +
+            "WHERE p.branchId = :branchId " +
+            "GROUP BY p.id, p.name, p.price")
+    List<Object[]> findProductsByBranchIdWithImages(@Param("branchId") Long branchId);
+
+    @Query("SELECT p.id, p.name, p.price, MIN(fpi.fileUrl) AS fileUrl " +
+            "FROM Product p " +
+            "JOIN ProductColor pc ON pc.productId = p.id " +
+            "JOIN FileProductImg fpi ON fpi.productColorId = pc.id " +
+            "WHERE p.categoryId = :categoryId " +
+            "GROUP BY p.id, p.name, p.price")
+    List<Object[]> findProductsByCategoryIdWithImages(@Param("categoryId") Long categoryId);
+
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword%")
+    List<Product> findByNameContains(@Param("keyword") String keyword);
 }

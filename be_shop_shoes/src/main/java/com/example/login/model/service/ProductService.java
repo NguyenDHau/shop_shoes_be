@@ -247,8 +247,39 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    @Transactional
     public void deleteProduct(Long id) {
+
+        // oa san pham
         productRepository.deleteById(id);
+
+        // loc ra file anh cu
+        List<FileProductProjection> fileOld = fileUrlProduct.filePublicOld(id);
+
+        // xoa thong tin luu truoc do
+        // trong product_color
+        List<ProductColor> productColors = productColorRepository.findByProductId(id);
+        List<Long> productColorIds = productColors.stream()
+                .map(ProductColor::getId) // Chuyển mỗi ProductColor thành id của nó
+                .collect(Collectors.toList());
+        // trong file
+        List<FileProductImg> fileProductImgs = fileUrlProduct.findByProductColorIdIn(productColorIds);
+        // trong inventory
+        List<Inventory> inventories = inventoryRepository.findByProductId(id);
+
+        // xoa thong tin
+        productColorRepository.deleteAll(productColors);
+        fileUrlProduct.deleteAll(fileProductImgs);
+        inventoryRepository.deleteAll(inventories);
+
+        // xoa anh thua tren clound
+        fileOld.forEach(img ->{
+                try {
+                    cloudinaryService.deleteImage(img.getPublicId());
+                } catch (Exception e) {
+                    System.out.printf(e.getMessage());
+                }
+        });
     }
 
 
@@ -282,5 +313,51 @@ public class ProductService {
         return response;
     }
 
+    // Tìm kiếm sản phẩm theo branchId
+    public List<ProductWithImageDto> getProductsByBranchId(Long branchId) {
+        // Gọi phương thức repository để lấy dữ liệu
+        List<Object[]> rawResults = productRepository.findProductsByBranchIdWithImages(branchId);
+
+        // Chuyển đổi dữ liệu từ rawResults sang danh sách DTO ProductWithImage
+        List<ProductWithImageDto> products = rawResults.stream()
+                .map(row -> new ProductWithImageDto(
+                        ((Number) row[0]).longValue(),    // id
+                        (String) row[1],                 // name
+                        (Double) row[2],                 // price
+                        (String) row[3]                  // fileUrl (min)
+                ))
+                .collect(Collectors.toList());
+
+        return products;
+    }
+
+    // Tìm kiếm sản phẩm theo categoryId
+    public List<ProductWithImageDto> getProductsByCategoryId(Long categoryId) {
+        List<Object[]> rawResults = productRepository.findProductsByCategoryIdWithImages(categoryId);
+
+        return rawResults.stream()
+                .map(row -> new ProductWithImageDto(
+                        ((Number) row[0]).longValue(),    // ID
+                        (String) row[1],                 // Name
+                        ((Number) row[2]).doubleValue(), // Price
+                        (String) row[3]                  // File URL
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // Tìm kiếm sản phẩm theo branchId hoặc categoryId
+    public List<ProductWithImageDto> getProducts(Long branchId, Long categoryId) {
+        if (branchId != null) {
+            return getProductsByBranchId(branchId); // Trả về danh sách sản phẩm theo branchId
+        } else if (categoryId != null) {
+            return getProductsByCategoryId(categoryId); // Trả về danh sách sản phẩm theo categoryId
+        } else {
+            return new ArrayList<>(); // Trả về danh sách rỗng nếu không có tham số nào
+        }
+    }
+
+    public List<Product> searchProducts(String keyword) {
+        return productRepository.findByNameContains(keyword);
+    }
 
 }

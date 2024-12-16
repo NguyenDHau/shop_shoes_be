@@ -80,10 +80,11 @@ public class JwtResponse {
     private String phoneNumber;
     private String address;
     private List<String> roles;
+    private String allowAccess;
 
     public JwtResponse(String token, Long id, String username, String email,
                        String firstName, String lastName, String phoneNumber, String address,
-                       List<String> roles) {
+                       List<String> roles, String allowAccess) {
         this.token = token;
         this.id = id;
         this.username = username;
@@ -93,6 +94,7 @@ public class JwtResponse {
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.roles = roles;
+        this.allowAccess = allowAccess;
     }
 
     // Getters and setters
@@ -139,4 +141,9 @@ public class JwtResponse {
     public List<String> getRoles() {
         return roles;
     }
+
+    public String getAllowAccess() {
+        return allowAccess;
+    }
+
 }

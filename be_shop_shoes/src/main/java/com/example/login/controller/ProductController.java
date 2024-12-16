@@ -3,6 +3,7 @@ package com.example.login.controller;
 import com.example.login.dto.ProductDetailResponseDto;
 import com.example.login.dto.ProductDto;
 import com.example.login.dto.ProductResponse;
+import com.example.login.dto.ProductWithImageDto;
 import com.example.login.dto.product.ProductDetailUpdateDto;
 import com.example.login.model.entity.Product;
 import com.example.login.model.service.ProductService;
@@ -51,5 +52,20 @@ public class ProductController {
         ProductDetailUpdateDto productDetailUpdateDto = productService.getProductDetailUpdate(id);
         return ResponseEntity.ok(productDetailUpdateDto);
     }
-    
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductWithImageDto>> searchProducts(
+            @RequestParam(value = "branchId", required = false) Long branchId,
+            @RequestParam(value = "categoryId", required = false) Long categoryId) {
+
+        List<ProductWithImageDto> products = productService.getProducts(branchId, categoryId);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/live-search")
+    public List<Product> searchProducts(@RequestParam String keyword) {
+        // Gọi service để tìm kiếm các sản phẩm chứa từ khóa 'keyword'
+        return productService.searchProducts(keyword);
+    }
+
 }

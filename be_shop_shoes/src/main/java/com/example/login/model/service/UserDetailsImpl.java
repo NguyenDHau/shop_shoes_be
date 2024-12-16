@@ -132,8 +132,10 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
+    private String allowAccess;
+
     public UserDetailsImpl(Long id, String username, String email, String password,
-                           String firstName, String lastName, String phoneNumber, String address,
+                           String firstName, String lastName, String phoneNumber, String address, String allowAccess,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
@@ -143,6 +145,7 @@ public class UserDetailsImpl implements UserDetails {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.allowAccess = allowAccess;
         this.authorities = authorities;
     }
 
@@ -160,6 +163,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getLastName(),
                 user.getPhoneNumber(),
                 user.getAddress(),
+                user.getAllowAccess(),
                 authorities
         );
     }
@@ -201,6 +205,15 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public String getUsername() {
         return username;
+    }
+
+
+    public String getAllowAccess() {
+        return allowAccess;
+    }
+
+    public void setAllowAccess(String allowAccess) {
+        this.allowAccess = allowAccess;
     }
 
     @Override

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -72,7 +72,8 @@ public class AuthController {
                 userDetails.getLastName(),
                 userDetails.getPhoneNumber(),
                 userDetails.getAddress(),
-                roles
+                roles,
+                userDetails.getAllowAccess()
         ));
     }
 
@@ -97,7 +98,8 @@ public class AuthController {
                 signupRequest.getFirstName(),
                 signupRequest.getLastName(),
                 signupRequest.getPhoneNumber(),
-                signupRequest.getAddress()
+                signupRequest.getAddress(),
+                "valid"
         );
 
         Set<String> strRoles = signupRequest.getRole();
@@ -145,4 +147,135 @@ public class AuthController {
         List<User> users = userRepository.findAll();
         return ResponseEntity.ok(users);
     }
+
+    @PutMapping("/update-allow-access")
+    public ResponseEntity<MessageResponse> updateAllowAccess(
+            @RequestParam("id") Long userId,
+            @RequestParam("allowAccess") String newAllowAccess) {
+
+        // Chỉ chấp nhận giá trị hợp lệ
+        if (!"Valid".equalsIgnoreCase(newAllowAccess) && !"Unvalid".equalsIgnoreCase(newAllowAccess)) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: Invalid value for allowAccess. Allowed values: 'true', 'false'."));
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Error: User not found"));
+
+        user.setAllowAccess(newAllowAccess);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("User allowAccess updated successfully"));
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable("id") Long userId) {
+        try {
+            // Tìm user theo id
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Error: User not found"));
+
+            // Trả về thông tin user
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException ex) {
+            // Xử lý nếu không tìm thấy user
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + ex.getMessage()));
+        }
+    }
+
+    @PutMapping("/user/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable("id") Long userId, @RequestBody User updatedUser) {
+        try {
+            // Tìm user theo id
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Error: User not found"));
+
+            // Cập nhật thông tin
+            if (updatedUser.getUsername() != null && !updatedUser.getUsername().isEmpty()) {
+                if (!user.getUsername().equals(updatedUser.getUsername())
+                        && userRepository.existsByUsername(updatedUser.getUsername())) {
+                    return ResponseEntity.badRequest()
+                            .body(new MessageResponse("Error: Username already taken!"));
+                }
+                user.setUsername(updatedUser.getUsername());
+            }
+
+            if (updatedUser.getEmail() != null && !updatedUser.getEmail().isEmpty()) {
+                if (!user.getEmail().equals(updatedUser.getEmail())
+                        && userRepository.existsByEmail(updatedUser.getEmail())) {
+                    return ResponseEntity.badRequest()
+                            .body(new MessageResponse("Error: Email already in use!"));
+                }
+                user.setEmail(updatedUser.getEmail());
+            }
+
+            if (updatedUser.getFirstName() != null) {
+                user.setFirstName(updatedUser.getFirstName());
+            }
+
+            if (updatedUser.getLastName() != null) {
+                user.setLastName(updatedUser.getLastName());
+            }
+
+            if (updatedUser.getPhoneNumber() != null) {
+                user.setPhoneNumber(updatedUser.getPhoneNumber());
+            }
+
+            if (updatedUser.getAddress() != null) {
+                user.setAddress(updatedUser.getAddress());
+            }
+
+            if (updatedUser.getAllowAccess() != null) {
+                user.setAllowAccess(updatedUser.getAllowAccess());
+            }
+
+            if (updatedUser.getAvatar() != null) {
+                user.setAvatar(updatedUser.getAvatar());
+            }
+
+            if (updatedUser.getPublicId() != null) {
+                user.setPublicId(updatedUser.getPublicId());
+            }
+
+            if (updatedUser.getSignature() != null) {
+                user.setSignature(updatedUser.getSignature());
+            }
+
+            // Lưu thay đổi
+            userRepository.save(user);
+
+            return ResponseEntity.ok(new MessageResponse("User updated successfully"));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + ex.getMessage()));
+        }
+    }
+
+    @PutMapping("/user/{id}/change-password")
+    public ResponseEntity<?> changePassword(
+            @PathVariable("id") Long userId,
+            @RequestParam("currentPassword") String currentPassword,
+            @RequestParam("newPassword") String newPassword) {
+        try {
+            // Tìm user theo id
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Error: User not found"));
+
+            // Kiểm tra mật khẩu hiện tại
+            if (!encoder.matches(currentPassword, user.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Error: Current password is incorrect"));
+            }
+
+            // Đặt mật khẩu mới
+            user.setPassword(encoder.encode(newPassword));
+            userRepository.save(user);
+
+            return ResponseEntity.ok(new MessageResponse("Password updated successfully"));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + ex.getMessage()));
+        }
+    }
+
+
+
 }

@@ -14,6 +14,10 @@ public class Category {
 
     private String categoryUrl;
 
+    private String publicId;
+
+    private String signature;
+
     public Category(Long id, String name) {
         this.id = id;
         this.name = name;
@@ -44,5 +48,21 @@ public class Category {
 
     public void setCategoryUrl(String categoryUrl) {
         this.categoryUrl = categoryUrl;
+    }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }
